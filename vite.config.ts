@@ -9,6 +9,7 @@ export default defineConfig({
       entry: [
         resolve(__dirname, "./src/decode.ts"),
         resolve(__dirname, "./src/decrypt.ts"),
+        resolve(__dirname, "./src/encode.ts"),
       ],
     },
     target: "esnext",
