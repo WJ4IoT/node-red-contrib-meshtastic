@@ -38,7 +38,7 @@ const nodeInit: NodeInitializer = (red): void => {
       if (Buffer.isBuffer(msg.payload)) {
         const decoded = Protobuf.Mqtt.ServiceEnvelope.fromBinary(msg.payload);
         if (!decoded.packet) {
-          console.debug(
+          this.debug(
             "No packet in ServiceEnvelope. Exiting without emitting msg",
           );
           return null;
@@ -49,12 +49,12 @@ const nodeInit: NodeInitializer = (red): void => {
           enumAsInteger: true,
         };
 
-        console.debug("Serializing ServiceEnvelope to JSON for output");
+        this.debug("Serializing ServiceEnvelope to JSON for output");
         const out = decoded.toJson(jsonWriteOptions);
 
         switch (decoded.packet.payloadVariant.case) {
           case "encrypted":
-            console.debug(
+            this.debug(
               "Payload was encrypted. Returning serialized ServiceEnvelope",
             );
             break;
@@ -64,7 +64,7 @@ const nodeInit: NodeInitializer = (red): void => {
               const portNum = decoded.packet.payloadVariant.value.portnum;
 
               if (decoders[portNum] === null) {
-                console.debug(`No decoder set for portnum ${portNum}`);
+                this.debug(`No decoder set for portnum ${portNum}`);
                 break;
               }
 
@@ -72,10 +72,10 @@ const nodeInit: NodeInitializer = (red): void => {
               const decoder = decoders[portNum];
 
               if (decoder instanceof TextDecoder) {
-                console.debug("TextDecoder detected. Decoding payload");
+                this.debug("TextDecoder detected. Decoding payload");
                 out.packet.decoded.payload = decoder.decode(payload);
               } else {
-                console.debug(
+                this.debug(
                   "Decoder was not null and not a TextDecoder. Assuming Protobuf decoder and decoding payload",
                 );
                 out.packet.decoded.payload = decoder
@@ -83,18 +83,18 @@ const nodeInit: NodeInitializer = (red): void => {
                   .toJson(jsonWriteOptions);
               }
 
-              console.debug(
+              this.debug(
                 `Decoded payload to JSON:\n${JSON.stringify(out, null, 2)}`,
               );
             } catch (error) {
-              console.error(`could not decode payload: ${error}`);
+              this.debug(`could not decode payload: ${error}`);
             }
 
             break;
           }
         }
 
-        console.debug("Outputting payload from decode node");
+        this.debug("Outputting payload from decode node");
         send({
           payload: out,
         });
