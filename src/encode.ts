@@ -67,15 +67,15 @@ const nodeInit: NodeInitializer = (red): void => {
           const portNum = envelope.packet.payloadVariant.value.portnum;
 
           if (encoders[portNum] === null) {
-            console.debug(`No encoder set for portnum ${portNum}`);
+            this.debug(`No encoder set for portnum ${portNum}`);
           } else {
             const encoder = encoders[portNum];
 
             if (encoder instanceof TextEncoder) {
-              console.debug("TextEncoder detected. Encoding payload", payloadObject);
+              this.debug("TextEncoder detected. Encoding payload", payloadObject);
               envelope.packet.payloadVariant.value.payload = Buffer.from(payloadObject);
             } else {
-              console.debug(
+              this.debug(
                 "Encoder was not null and not a TextEncoder. Assuming Protobuf encoder and encoding payloadObject",
               );
               envelope.packet.payloadVariant.value.payload = encoder
@@ -83,7 +83,7 @@ const nodeInit: NodeInitializer = (red): void => {
                 .toBinary();
             }
 
-            console.debug(
+            this.debug(
               `Encoded payload to binary:\n${JSON.stringify(envelope, null, 2)}`,
             );
           }
@@ -106,4 +106,3 @@ const nodeInit: NodeInitializer = (red): void => {
 };
 
 export default nodeInit;
-
