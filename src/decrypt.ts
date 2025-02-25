@@ -64,7 +64,7 @@ const nodeInit: NodeInitializer = (red): void => {
             const decipher = crypto.createDecipheriv(algorithm, key, nonceBuffer);
             const decryptedBuffer = Buffer.concat([decipher.update(Buffer.from(packet.encrypted, "base64")), decipher.final()]);
 
-            console.debug('Decrypt', packet.encrypted, 'with key', settingsKey, 'and nonce', nonceBuffer.toString('base64'), 'using', algorithm, 'result', decryptedBuffer.toString('base64'));
+            this.debug('Decrypt', packet.encrypted, 'with key', settingsKey, 'and nonce', nonceBuffer.toString('base64'), 'using', algorithm, 'result', decryptedBuffer.toString('base64'));
 
             if (decryptedBuffer) {
                 try {
@@ -75,17 +75,17 @@ const nodeInit: NodeInitializer = (red): void => {
                   const portNum = decoded.portnum;
 
                   if (decoders[portNum] === null) {
-                    console.debug(`No decoder set for portnum ${portNum}`);
+                    this.debug(`No decoder set for portnum ${portNum}`);
                   }
                   else {
                     const payload  = Buffer.from(decoded.payload, 'base64');
                     const decoder = decoders[portNum];
 
                     if (decoder instanceof TextDecoder) {
-                      console.debug("TextDecoder detected. Decoding payload");
+                      this.debug("TextDecoder detected. Decoding payload");
                       decoded.payload = decoder.decode(payload);
                     } else {
-                      console.debug(
+                      this.debug(
                         "Decoder was not null and not a TextDecoder. Assuming Protobuf decoder and decoding payload",
                       );
                       
@@ -95,7 +95,7 @@ const nodeInit: NodeInitializer = (red): void => {
                     }
                   }
 
-                  console.debug(
+                  this.debug(
                     `Decoded payload to JSON:\n${JSON.stringify(decoded, null, 2)}`,
                   );
                 } catch (error) {
@@ -106,7 +106,7 @@ const nodeInit: NodeInitializer = (red): void => {
             }
           }
         } catch (e) {
-            console.error(e, "Failed to decrypt", packet.encrypted, "with key", settingsKey);
+            this.debug(e, "Failed to decrypt", packet.encrypted, "with key", settingsKey);
             node.error("Failed to decrypt due to an error");
         }
       }
